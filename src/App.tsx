@@ -1,42 +1,34 @@
-import { useCallback, useEffect, useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import JobsPage from './pages/JobsPage'
+import LoginPage from './pages/auth/LoginPage'
+import RegisterPage from './pages/auth/RegisterPage'
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import { AuthProvider } from './features/auth/context/AuthContext'
 
-type Route = 'home' | 'jobs'
-
-function pathToRoute(pathname: string): Route {
-  const p = pathname.replace(/\/+$/, '') || '/'
-  if (p === '/jobs') return 'jobs'
-  return 'home'
+function LandingRoute() {
+  const navigate = useNavigate()
+  return <LandingPage onNavigateJobs={() => navigate('/jobs')} />
 }
 
-function routeToPath(route: Route): string {
-  return route === 'jobs' ? '/jobs' : '/'
+function JobsRoute() {
+  const navigate = useNavigate()
+  return <JobsPage onNavigateHome={() => navigate('/')} />
 }
 
 export default function App() {
-  const [route, setRoute] = useState<Route>(() =>
-    typeof window !== 'undefined' ? pathToRoute(window.location.pathname) : 'home'
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingRoute />} />
+          <Route path="/jobs" element={<JobsRoute />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
-
-  useEffect(() => {
-    const onPop = () => setRoute(pathToRoute(window.location.pathname))
-    window.addEventListener('popstate', onPop)
-    return () => window.removeEventListener('popstate', onPop)
-  }, [])
-
-  const navigate = useCallback((next: Route) => {
-    const path = routeToPath(next)
-    if (window.location.pathname !== path) {
-      window.history.pushState({}, '', path)
-    }
-    setRoute(next)
-    window.scrollTo(0, 0)
-  }, [])
-
-  if (route === 'jobs') {
-    return <JobsPage onNavigateHome={() => navigate('home')} />
-  }
-
-  return <LandingPage onNavigateJobs={() => navigate('jobs')} />
 }

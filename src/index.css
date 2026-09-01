@@ -1,58 +1,78 @@
-:root {
-  --ink: #1b2430;
-  --ink-soft: #232f3d;
-  --paper: #ede6d6;
-  --paper-dim: #e1d8c4;
-  --brass: #c9a24b;
-  --brass-bright: #dab766;
-  --signal: #5fa8a0;
-  --rust: #b4573f;
-  --muted: #8b95a3;
-  --muted-on-paper: #6b6455;
-  --line: rgba(237, 230, 214, 0.14);
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+/* ---------------------------------------------------------------------
+   Everything below is stuff Tailwind utility classes can't express:
+   global pseudo-selectors (::selection), a global focus-visible ring
+   that must apply to every element, reduced-motion overrides, and the
+   two scalloped/notched clip-path shapes used by the job card + chips.
+   Everything else in the app is Tailwind utility classes in the JSX.
+   --------------------------------------------------------------------- */
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    @apply bg-ink text-paper font-body antialiased;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  ::selection {
+    @apply bg-brass text-ink;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  :focus-visible {
+    @apply outline outline-2 outline-brass-bright outline-offset-2;
+  }
 }
 
-* {
-  box-sizing: border-box;
-}
+@layer utilities {
+  /* Scalloped bottom edge on the job board index cards */
+  .clip-card {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 100%,
+      92% 96%,
+      84% 100%,
+      76% 96%,
+      68% 100%,
+      60% 96%,
+      52% 100%,
+      44% 96%,
+      36% 100%,
+      28% 96%,
+      20% 100%,
+      12% 96%,
+      4% 100%,
+      0 96%
+    );
+  }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background: var(--ink);
-  color: var(--paper);
-  font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
-}
-
-#root {
-  min-height: 100vh;
-}
-
-button {
-  font-family: inherit;
-}
-
-::selection {
-  background: var(--brass);
-  color: var(--ink);
-}
-
-a {
-  color: inherit;
-}
-
-:focus-visible {
-  outline: 2px solid var(--brass-bright);
-  outline-offset: 2px;
+  /* Clipped-corner "ticket stub" shape on filter chips */
+  .clip-chip {
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
